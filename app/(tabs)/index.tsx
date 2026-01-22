@@ -1,98 +1,496 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  Alert,
+  ActivityIndicator,
+  Modal,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useEffect, useState, useRef } from "react";
+import * as Location from "expo-location";
+import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { apiFetch } from "../../services/api";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+/* ================= CLOUDINARY ================= */
+const CLOUD_NAME = process.env.EXPO_PUBLIC_CLOUD_NAME!;
+const UPLOAD_PRESET = process.env.EXPO_PUBLIC_CLOUD_UPLOAD_PRESET!;
+const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
-export default function HomeScreen() {
+/* ================= ROLES ================= */
+const roles = [
+  { id: "field", title: "Field Guy", icon: "person-outline", color: "#4d7c0f" },
+  {
+    id: "agronomist",
+    title: "Agronomist",
+    icon: "leaf-outline",
+    color: "#166534",
+  },
+  {
+    id: "junior",
+    title: "Junior Agronomist",
+    icon: "school-outline",
+    color: "#65a30d",
+  },
+  {
+    id: "senior",
+    title: "Senior Agronomist",
+    icon: "star-outline",
+    color: "#15803d",
+  },
+];
+
+export default function Home() {
+  const [currentDate, setCurrentDate] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [startModal, setStartModal] = useState(false);
+  const [endModal, setEndModal] = useState(false);
+  const [imageUri, setImageUri] = useState<string | null>(null);
+
+  const trackingTimer = useRef<NodeJS.Timeout | null>(null);
+
+  /* ================= DATE ================= */
+  useEffect(() => {
+    const update = () => {
+      setCurrentDate(
+        new Date().toLocaleDateString("en-IN", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }),
+      );
+    };
+    update();
+    const timer = setInterval(update, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  /* ================= CAMERA ================= */
+  const takePhoto = async () => {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) {
+      Alert.alert("Camera permission required");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({ quality: 0.6 });
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  /* ================= CLOUDINARY ================= */
+  const uploadToCloudinary = async (uri: string) => {
+    const form = new FormData();
+    form.append("file", {
+      uri,
+      type: "image/jpeg",
+      name: "photo.jpg",
+    } as any);
+    form.append("upload_preset", UPLOAD_PRESET);
+
+    const res = await fetch(CLOUDINARY_URL, {
+      method: "POST",
+      body: form,
+    });
+
+    const data = await res.json();
+    return data.secure_url;
+  };
+
+  /* ================= AUTO TRACKING ================= */
+  const startAutoTracking = (sessionId: string) => {
+    console.log("🟢 Auto tracking started");
+
+    trackingTimer.current = setInterval(async () => {
+      try {
+        const loc = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
+        });
+
+        const payload = {
+          sessionId,
+          lat: loc.coords.latitude,
+          lng: loc.coords.longitude,
+          accuracy: loc.coords.accuracy,
+          timestamp: new Date().toISOString(),
+        };
+
+        console.log("📍 Auto point:", payload);
+
+        await apiFetch("/tracking/auto-point", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      } catch (err) {
+        console.log("⚠ Auto tracking error:", err);
+      }
+    }, 10000); // every 10 sec
+  };
+
+  const stopAutoTracking = () => {
+    if (trackingTimer.current) {
+      clearInterval(trackingTimer.current);
+      trackingTimer.current = null;
+      console.log("🔴 Auto tracking stopped");
+    }
+  };
+
+  /* ================= START TRACKING ================= */
+  const confirmStartTracking = async () => {
+    try {
+      if (!imageUri) return Alert.alert("Please take photo");
+
+      setLoading(true);
+
+      const locPerm = await Location.requestForegroundPermissionsAsync();
+      if (locPerm.status !== "granted") {
+        Alert.alert("Location permission required");
+        return;
+      }
+
+      const imageUrl = await uploadToCloudinary(imageUri);
+
+      const loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      const payload = {
+        lat: loc.coords.latitude,
+        lng: loc.coords.longitude,
+        accuracy: loc.coords.accuracy,
+        startImage: imageUrl,
+      };
+
+      const data = await apiFetch("/tracking/start", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      await AsyncStorage.setItem("trackingSessionId", data._id);
+
+      startAutoTracking(data._id); // ✅ START AUTO TRACK
+
+      setStartModal(false);
+      setImageUri(null);
+
+      Alert.alert("Tracking Started");
+    } catch (err: any) {
+      console.log("❌ START ERROR:", err);
+      Alert.alert("Error", err.message || "Start failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ================= END TRACKING ================= */
+  const confirmEndTracking = async () => {
+    try {
+      if (!imageUri) return Alert.alert("Please take photo");
+
+      setLoading(true);
+
+      const sessionId = await AsyncStorage.getItem("trackingSessionId");
+      if (!sessionId) return Alert.alert("No active session");
+
+      const imageUrl = await uploadToCloudinary(imageUri);
+
+      const loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      const payload = {
+        sessionId,
+        lat: loc.coords.latitude,
+        lng: loc.coords.longitude,
+        accuracy: loc.coords.accuracy,
+        endImage: imageUrl,
+      };
+
+      await apiFetch("/tracking/stop", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      stopAutoTracking(); // ✅ STOP AUTO TRACK
+
+      await AsyncStorage.removeItem("trackingSessionId");
+
+      setEndModal(false);
+      setImageUri(null);
+
+      Alert.alert("Tracking Ended");
+    } catch (err: any) {
+      console.log("❌ END ERROR:", err);
+      Alert.alert("Error", err.message || "Stop failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ================= ROLE CARD ================= */
+  const renderRoleCard = ({ item }: { item: (typeof roles)[0] }) => (
+    <TouchableOpacity
+      style={styles.roleCard}
+      onPress={() => router.push(`/role/${item.id}`)}
+    >
+      <View style={styles.roleInfo}>
+        <View
+          style={[
+            styles.roleIconContainer,
+            { backgroundColor: `${item.color}20` },
+          ]}
+        >
+          <Ionicons name={item.icon as any} size={28} color={item.color} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.roleTitle}>{item.title}</Text>
+          <Text style={styles.roleSubtitle}>
+            {item.id === "field"
+              ? "Track visits & tasks in field"
+              : "Analyze crops & give recommendations"}
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color="#64748b" />
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* HEADER */}
+        <View style={styles.header}>
+          <View style={styles.profileSection}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
+            >
+              <View style={styles.avatar}>
+                <Image
+                  source={require("../../assets/images/field_avatar.png")}
+                  style={styles.avatarImage}
+                />
+              </View>
+              <View>
+                <Text style={styles.greeting}>Welcome</Text>
+                <Text style={styles.date}>{currentDate}</Text>
+              </View>
+            </View>
+            <Image
+              source={require("../../assets/images/oneroot_backside2.png")}
+              style={styles.brandLogo}
             />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+          </View>
+        </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        {/* ROLE LIST */}
+        <Text style={styles.sectionTitle}>Select Your Role</Text>
+
+        <FlatList
+          data={roles}
+          keyExtractor={(item) => item.id}
+          renderItem={renderRoleCard}
+          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.rolesList}
+        />
+
+        {/* BUTTONS */}
+        <View style={styles.trackingBox}>
+          <TouchableOpacity
+            style={[styles.trackBtn, { backgroundColor: "#16a34a" }]}
+            onPress={() => setStartModal(true)}
+          >
+            <Text style={styles.trackText}>START</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.trackBtn, { backgroundColor: "#dc2626" }]}
+            onPress={() => setEndModal(true)}
+          >
+            <Text style={styles.trackText}>END</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* START MODAL */}
+        <Modal visible={startModal} transparent animationType="slide">
+          <View style={styles.modalBg}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>Start Tracking</Text>
+
+              <TouchableOpacity style={styles.photoBtn} onPress={takePhoto}>
+                <Text style={{ color: "#fff" }}>
+                  {imageUri ? "Retake Photo" : "Take Photo"}
+                </Text>
+              </TouchableOpacity>
+
+              {imageUri && (
+                <Image source={{ uri: imageUri }} style={styles.preview} />
+              )}
+
+              <TouchableOpacity
+                style={[styles.confirmBtn, { backgroundColor: "#16a34a" }]}
+                onPress={confirmStartTracking}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.confirmText}>CONFIRM START</Text>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  setStartModal(false);
+                  setImageUri(null);
+                }}
+              >
+                <Text style={{ color: "#64748b" }}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        {/* END MODAL */}
+        <Modal visible={endModal} transparent animationType="slide">
+          <View style={styles.modalBg}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>End Tracking</Text>
+
+              <TouchableOpacity style={styles.photoBtn} onPress={takePhoto}>
+                <Text style={{ color: "#fff" }}>
+                  {imageUri ? "Retake Photo" : "Take Photo"}
+                </Text>
+              </TouchableOpacity>
+
+              {imageUri && (
+                <Image source={{ uri: imageUri }} style={styles.preview} />
+              )}
+
+              <TouchableOpacity
+                style={[styles.confirmBtn, { backgroundColor: "#dc2626" }]}
+                onPress={confirmEndTracking}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.confirmText}>CONFIRM END</Text>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  setEndModal(false);
+                  setImageUri(null);
+                }}
+              >
+                <Text style={{ color: "#64748b" }}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </SafeAreaView>
   );
 }
 
+/* ================= STYLES ================= */
+
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  safeArea: { flex: 1, backgroundColor: "#f0fdf4" },
+  container: { flex: 1 },
+  header: { padding: 16, marginBottom: 8 },
+  profileSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  avatar: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: "#86efac",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  avatarImage: { width: "115%", height: "115%" },
+  greeting: { fontSize: 24, fontWeight: "700", color: "#166534" },
+  date: { color: "#64748b", fontSize: 15 },
+  brandLogo: { width: 90, height: 36, resizeMode: "contain" },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#166534",
+    marginBottom: 16,
+    paddingHorizontal: 16,
   },
+  rolesList: { paddingHorizontal: 16, paddingBottom: 20 },
+  roleCard: {
+    backgroundColor: "#ffffff",
+    padding: 18,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+  roleInfo: { flexDirection: "row", alignItems: "center", gap: 16 },
+  roleIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  roleTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1e293b",
+    marginBottom: 4,
+  },
+  roleSubtitle: { fontSize: 14, color: "#64748b" },
+  trackingBox: { padding: 16, flexDirection: "row", gap: 12 },
+  trackBtn: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  trackText: { color: "#fff", fontSize: 18, fontWeight: "700" },
+  modalBg: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalBox: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 14,
+    width: "85%",
+    alignItems: "center",
+    gap: 12,
+  },
+  modalTitle: { fontSize: 18, fontWeight: "700" },
+  photoBtn: {
+    backgroundColor: "#2563eb",
+    padding: 12,
+    borderRadius: 10,
+  },
+  preview: { width: 200, height: 200, borderRadius: 10 },
+  confirmBtn: {
+    width: "100%",
+    padding: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  confirmText: { color: "#fff", fontWeight: "700" },
 });
