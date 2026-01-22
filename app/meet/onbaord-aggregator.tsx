@@ -328,7 +328,7 @@ export default function OnboardAggregator() {
 
       console.log("FINAL PAYLOAD:", payload);
 
-      const data = await apiFetch(`/aggregators/onboard`, {
+      const data = await apiFetch(`/api/aggregators/onboard`, {
         method: "POST",
         body: JSON.stringify(payload),
       });

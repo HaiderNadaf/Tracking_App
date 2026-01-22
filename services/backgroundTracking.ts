@@ -78,7 +78,7 @@ TaskManager.defineTask(LOCATION_TASK, async ({ data, error }) => {
   console.log("📍 BG POINT:", point);
 
   try {
-    await apiFetch("/tracking/point", {
+    await apiFetch("/api/tracking/point", {
       method: "POST",
       body: JSON.stringify(point),
     });

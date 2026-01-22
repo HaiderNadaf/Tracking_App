@@ -127,7 +127,7 @@ export default function TabLayout() {
       const token = await AsyncStorage.getItem("accessToken");
       if (!token) throw new Error("No token");
 
-      await apiFetch("/users/me"); // protected route
+      await apiFetch("/api/users/me"); // protected route
     } catch (e) {
       await AsyncStorage.multiRemove(["accessToken", "refreshToken", "user"]);
       router.replace("/(auth)/login");

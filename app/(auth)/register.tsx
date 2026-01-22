@@ -703,7 +703,7 @@ export default function Register() {
     try {
       setLoading(true);
 
-      const res = await apiFetch("/users", {
+      const res = await apiFetch("/api/users", {
         method: "POST",
         body: JSON.stringify({ name: name.trim(), phone, role: "field_guy" }),
       });

@@ -341,7 +341,7 @@ export default function Pending() {
       if (!userStr) return;
 
       const user = JSON.parse(userStr);
-      const res = await apiFetch(`/loads/pending/${user._id}`);
+      const res = await apiFetch(`/api/loads/pending/${user._id}`);
       setLoads(res || []);
     } catch (err) {
       Alert.alert("Error", "Failed to load pending loads");
@@ -397,7 +397,7 @@ export default function Pending() {
 
       if (!uploadData.secure_url) throw new Error("Image upload failed");
 
-      await apiFetch(`/loads/${selectedLoad._id}/complete`, {
+      await apiFetch(`/api/loads/${selectedLoad._id}/complete`, {
         method: "POST",
         body: JSON.stringify({
           loadEndedAt: new Date().toISOString(),

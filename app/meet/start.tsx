@@ -342,7 +342,7 @@ export default function LoadDecision() {
       }
       const user = JSON.parse(userStr);
 
-      const visit = await apiFetch("/visits", {
+      const visit = await apiFetch("/api/visits", {
         method: "POST",
         body: JSON.stringify({
           userId: user._id,
@@ -370,7 +370,7 @@ export default function LoadDecision() {
     if (!remark.trim() || !imageUri) {
       Alert.alert(
         "Missing Information",
-        "Please add a remark and take a photo."
+        "Please add a remark and take a photo.",
       );
       return;
     }
@@ -409,7 +409,7 @@ export default function LoadDecision() {
       if (!uploadData.secure_url) throw new Error("Image upload failed");
 
       // Create visit
-      const visit = await apiFetch("/visits", {
+      const visit = await apiFetch("/api/visits", {
         method: "POST",
         body: JSON.stringify({
           userId: user._id,

@@ -770,7 +770,7 @@ export default function LoadForm() {
       console.log("🔍 Searching aggregators:", text);
       setSearchingAgg(true);
 
-      const res = await apiFetch(`/aggregators/search?mobile=${text}`);
+      const res = await apiFetch(`/api/aggregators/search?mobile=${text}`);
 
       console.log("✅ Suggestions:", res);
       setSuggestions(res || []);
@@ -827,7 +827,7 @@ export default function LoadForm() {
 
       console.log("🚀 Creating load...");
 
-      const loadRes = await apiFetch("/loads", {
+      const loadRes = await apiFetch("/api/loads", {
         method: "POST",
         body: JSON.stringify({
           visitId,
@@ -862,7 +862,7 @@ export default function LoadForm() {
         const img = await upload.json();
         console.log("☁️ Image URL:", img.secure_url);
 
-        await apiFetch(`/loads/${loadRes._id}/complete`, {
+        await apiFetch(`/api/loads/${loadRes._id}/complete`, {
           method: "POST",
           body: JSON.stringify({
             loadEndedAt: new Date().toISOString(),

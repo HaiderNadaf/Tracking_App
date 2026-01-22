@@ -126,7 +126,7 @@ export default function Home() {
 
         console.log("📍 Auto point:", payload);
 
-        await apiFetch("/tracking/auto-point", {
+        await apiFetch("/api/tracking/auto-point", {
           method: "POST",
           body: JSON.stringify(payload),
         });
@@ -170,7 +170,7 @@ export default function Home() {
         startImage: imageUrl,
       };
 
-      const data = await apiFetch("/tracking/start", {
+      const data = await apiFetch("/api/tracking/start", {
         method: "POST",
         body: JSON.stringify(payload),
       });
@@ -215,7 +215,7 @@ export default function Home() {
         endImage: imageUrl,
       };
 
-      await apiFetch("/tracking/stop", {
+      await apiFetch("/api/tracking/stop", {
         method: "POST",
         body: JSON.stringify(payload),
       });

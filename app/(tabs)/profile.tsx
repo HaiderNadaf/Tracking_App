@@ -502,7 +502,7 @@ export default function Profile() {
   const loadUser = async () => {
     try {
       setLoading(true);
-      const res = await apiFetch("/users/me");
+      const res = await apiFetch("/api/users/me");
       setUser(res);
     } catch (err: any) {
       console.error("Profile load error:", err);
@@ -536,7 +536,7 @@ export default function Profile() {
           },
         },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   };
 

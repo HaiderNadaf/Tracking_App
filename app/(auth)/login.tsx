@@ -388,7 +388,7 @@ export default function Login() {
       setLoading(true);
       console.log("🚀 Sending login request...");
 
-      const res = await apiFetch("/auth/login", {
+      const res = await apiFetch("/api/auth/login", {
         method: "POST",
         body: JSON.stringify({ phone }),
       });
