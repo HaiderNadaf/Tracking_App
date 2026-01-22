@@ -104,7 +104,7 @@ export default function RolePage() {
             >
               <View style={styles.avatar}>
                 <Image
-                  source={require("../../assets/images/avatar.png")} // ← adjust path
+                  source={require("../../assets/images/field_guy.png")} // ← adjust path
                   style={styles.avatarImage}
                 />
               </View>

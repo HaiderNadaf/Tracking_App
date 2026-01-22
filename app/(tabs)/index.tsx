@@ -275,7 +275,7 @@ export default function Home() {
             >
               <View style={styles.avatar}>
                 <Image
-                  source={require("../../assets/images/avatar.png")}
+                  source={require("../../assets/images/field_guy.png")}
                   style={styles.avatarImage}
                 />
               </View>
