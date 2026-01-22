@@ -87,9 +87,9 @@ export default function RolePage() {
     type === "field"
       ? "Field Guy"
       : type === "agronomist"
-      ? "Agronomist"
-      : type?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ||
-        "Role";
+        ? "Agronomist"
+        : type?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ||
+          "Role";
 
   const isFieldGuy = type === "field";
 
@@ -104,7 +104,7 @@ export default function RolePage() {
             >
               <View style={styles.avatar}>
                 <Image
-                  source={require("../../assets/images/field_avatar.png")} // ← adjust path
+                  source={require("../../assets/images/avatar.png")} // ← adjust path
                   style={styles.avatarImage}
                 />
               </View>
