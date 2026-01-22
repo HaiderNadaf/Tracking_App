@@ -110,30 +110,33 @@ export default function Home() {
   const startAutoTracking = (sessionId: string) => {
     console.log("🟢 Auto tracking started");
 
-    trackingTimer.current = setInterval(async () => {
-      try {
-        const loc = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.High,
-        });
+    trackingTimer.current = setInterval(
+      async () => {
+        try {
+          const loc = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.High,
+          });
 
-        const payload = {
-          sessionId,
-          lat: loc.coords.latitude,
-          lng: loc.coords.longitude,
-          accuracy: loc.coords.accuracy,
-          timestamp: new Date().toISOString(),
-        };
+          const payload = {
+            sessionId,
+            lat: loc.coords.latitude,
+            lng: loc.coords.longitude,
+            accuracy: loc.coords.accuracy,
+            timestamp: new Date().toISOString(),
+          };
 
-        console.log("📍 Auto point:", payload);
+          console.log("📍 Auto point:", payload);
 
-        await apiFetch("/api/tracking/auto-point", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
-      } catch (err) {
-        console.log("⚠ Auto tracking error:", err);
-      }
-    }, 10000); // every 10 sec
+          await apiFetch("/api/tracking/auto-point", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+        } catch (err) {
+          console.log("⚠ Auto tracking error:", err);
+        }
+      },
+      20 * 60 * 1000,
+    ); // ✅ 20 minutes
   };
 
   const stopAutoTracking = () => {
