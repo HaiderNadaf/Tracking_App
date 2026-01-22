@@ -19,8 +19,8 @@
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-          "ACCESS_BACKGROUND_LOCATION",
-             "FOREGROUND_SERVICE",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
         "CAMERA",
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
@@ -53,11 +53,18 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "79a0dfa3-33fe-43f6-97c4-c37f7bb4796b"
+      }
     }
   }
 }
