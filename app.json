@@ -16,16 +16,14 @@
       }
     },
     "android": {
-      "permissions": [
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION",
-        "FOREGROUND_SERVICE",
-        "CAMERA",
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "CAMERA"
-      ],
+     "permissions": [
+  "ACCESS_FINE_LOCATION",
+  "ACCESS_COARSE_LOCATION",
+  "ACCESS_BACKGROUND_LOCATION",
+  "FOREGROUND_SERVICE",
+  "CAMERA"
+]
+,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -40,22 +38,29 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
-        }
-      ],
-      "expo-font"
-    ],
+   "plugins": [
+  "expo-router",
+  [
+    "expo-location",
+    {
+      "isAndroidBackgroundLocationEnabled": true
+    }
+  ],
+  [
+    "expo-splash-screen",
+    {
+      "image": "./assets/images/splash.png",
+      "imageWidth": 200,
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff",
+      "dark": {
+        "backgroundColor": "#000000"
+      }
+    }
+  ],
+  "expo-font"
+]
+,
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
@@ -63,8 +68,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "79a0dfa3-33fe-43f6-97c4-c37f7bb4796b"
+        "projectId": "08320b13-98f8-4345-8166-10eccacfdd47"
       }
-    }
+    },
+    "owner": "haidernadaf"
   }
 }

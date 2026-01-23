@@ -25,6 +25,7 @@
 // import "../tasks/background-location"; // ✅ this actually runs the file
 
 import { Stack } from "expo-router";
+import "../services/backgroundTracking";
 
 export default function RootLayout() {
   return (
