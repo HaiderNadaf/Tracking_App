@@ -3,7 +3,7 @@ import * as Device from "expo-device";
 
 export async function registerForPushToken() {
   if (!Device.isDevice) {
-    console.log("❌ Must use real device");
+    console.log("❌ Must use physical device");
     return null;
   }
 
@@ -17,7 +17,7 @@ export async function registerForPushToken() {
   }
 
   if (finalStatus !== "granted") {
-    console.log("❌ Push permission denied");
+    console.log("❌ Notification permission denied");
     return null;
   }
 
@@ -25,5 +25,5 @@ export async function registerForPushToken() {
 
   console.log("🔥 EXPO PUSH TOKEN:", token);
 
-  return token;
+  return token; // ExponentPushToken[xxxxxxxx]
 }
