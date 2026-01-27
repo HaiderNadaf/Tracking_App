@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "713243470992",
-    "project_id": "tracking-a025a",
-    "storage_bucket": "tracking-a025a.firebasestorage.app"
+    "project_number": "24066182853",
+    "project_id": "tracking-310fe",
+    "storage_bucket": "tracking-310fe.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:713243470992:android:3642e604ca99a68d4c7c15",
+        "mobilesdk_app_id": "1:24066182853:android:f30869ed33cb01dca3aaac",
         "android_client_info": {
-          "package_name": "com.haidernadaf.myApp"
+          "package_name": "com.haidernadaf.myapp.v2"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCHLFlrNvReqRPfgx_P2XnPUh4fdd5CAZQ"
+          "current_key": "AIzaSyBjZPK8zoHMRb04P5Ex0sozHdbGLlsEAC0"
         }
       ],
       "services": {
