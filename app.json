@@ -97,7 +97,7 @@
     "android": {
      
       "package": "com.haidernadaf.fieldops",
-      "useNextNotificationsApi": true,
+
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
