@@ -513,6 +513,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
+import * as Notifications from "expo-notifications";
+
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -560,6 +562,47 @@ export default function Home() {
   const [imageUri, setImageUri] = useState<string | null>(null);
 
   const [isTracking, setIsTracking] = useState(false);
+
+  /* ================= CHECK TRACKING + SYNC OFFLINE ================= */
+  useEffect(() => {
+    const init = async () => {
+      const s = await AsyncStorage.getItem("trackingSession");
+      setIsTracking(!!s);
+      await syncOfflinePoints();
+    };
+    init();
+  }, []);
+
+  /* ================= LISTEN PUSH NOTIFICATION ================= */
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        console.log("🔔 Notification clicked:", response);
+
+        // open availability popup
+        setStartModal(false);
+        setEndModal(false);
+
+        Alert.alert("Availability Check", "Are you available for call?", [
+          { text: "NOT AVAILABLE", style: "cancel" },
+          { text: "AVAILABLE" },
+        ]);
+      },
+    );
+
+    return () => sub.remove();
+  }, []);
+
+  //OPTIONAL (Auto popup without tap)
+
+  useEffect(() => {
+    const sub = Notifications.addNotificationReceivedListener(() => {
+      console.log("🔔 Notification received");
+      Alert.alert("Are you available for call?");
+    });
+
+    return () => sub.remove();
+  }, []);
 
   /* ================= DATE ================= */
   useEffect(() => {

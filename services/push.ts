@@ -21,9 +21,9 @@ export async function registerForPushToken() {
     return null;
   }
 
-  const token = (await Notifications.getDevicePushTokenAsync()).data;
+  const token = (await Notifications.getExpoPushTokenAsync()).data;
 
-  console.log("🔥 FCM TOKEN:", token);
+  console.log("🔥 EXPO PUSH TOKEN:", token);
 
   return token;
 }
