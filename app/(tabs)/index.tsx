@@ -497,6 +497,7 @@
 //   },
 //   confirmText: { color: "#fff", fontWeight: "700" },
 // });
+
 import {
   View,
   Text,

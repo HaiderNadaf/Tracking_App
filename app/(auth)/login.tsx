@@ -369,6 +369,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { apiFetch } from "../../services/api";
 import { useState } from "react";
+import { registerForPushToken } from "../../services/push";
 
 export default function Login() {
   const [phone, setPhone] = useState("");
@@ -397,11 +398,28 @@ export default function Login() {
 
       console.log("💾 Saving tokens & user to storage...");
 
+      // await AsyncStorage.multiSet([
+      //   ["accessToken", res.accessToken],
+      //   ["refreshToken", res.refreshToken],
+      //   ["user", JSON.stringify(res.user)],
+      // ]);
+
       await AsyncStorage.multiSet([
         ["accessToken", res.accessToken],
         ["refreshToken", res.refreshToken],
         ["user", JSON.stringify(res.user)],
       ]);
+
+      // 🔔 Register for push & send to backend
+      const fcmToken = await registerForPushToken();
+
+      if (fcmToken) {
+        await apiFetch("/api/users/save-fcm", {
+          method: "POST",
+          body: JSON.stringify({ token: fcmToken }),
+        });
+        console.log("✅ FCM token saved to backend");
+      }
 
       console.log("➡️ Redirecting to tabs...");
       router.replace("/(tabs)");
