@@ -152,12 +152,7 @@
       "reactCompiler": true
     },
 
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "08320b13-98f8-4345-8166-10eccacfdd47"
-      }
-    },
+  
 
     "owner": "haidernadaf"
   }
