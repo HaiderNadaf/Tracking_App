@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "713243470992",
+    "project_id": "tracking-a025a",
+    "storage_bucket": "tracking-a025a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:713243470992:android:3642e604ca99a68d4c7c15",
+        "android_client_info": {
+          "package_name": "com.haidernadaf.myApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHLFlrNvReqRPfgx_P2XnPUh4fdd5CAZQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,3 +1,82 @@
+// {
+//   "expo": {
+//     "slug": "fields-ops-app",
+//     "name": "Field Ops",
+//     "version": "1.0.0",
+//     "orientation": "portrait",
+//     "icon": "./assets/images/icon.png",
+//     "scheme": "myapp",
+//     "userInterfaceStyle": "automatic",
+//     "newArchEnabled": true,
+//     "ios": {
+//       "supportsTablet": true,
+//       "infoPlist": {
+//         "NSLocationWhenInUseUsageDescription": "Location is required to track field visits",
+//         "NSCameraUsageDescription": "Camera is required to capture visit photos"
+//       }
+//     },
+//     "android": {
+//        "package": "com.haidernadaf.myApp",
+//           "googleServicesFile": "./google-services.json",
+//       "useNextNotificationsApi": true,
+//      "permissions": [
+//   "ACCESS_FINE_LOCATION",
+//   "ACCESS_COARSE_LOCATION",
+//   "ACCESS_BACKGROUND_LOCATION",
+//   "FOREGROUND_SERVICE",
+//   "CAMERA"
+// ]
+// ,
+//      "adaptiveIcon": {
+//     "foregroundImage": "./assets/images/icon.png",
+//     "backgroundColor": "#ffffff"
+//   },
+//       "edgeToEdgeEnabled": true,
+//       "predictiveBackGestureEnabled": false,
+   
+//     },
+//     "web": {
+//       "output": "static",
+//       "favicon": "./assets/images/favicon.png"
+//     },
+//    "plugins": [
+//   "expo-router",
+//   [
+//     "expo-location",
+//     {
+//       "isAndroidBackgroundLocationEnabled": true
+//     }
+//   ],
+//   [
+//     "expo-splash-screen",
+//     {
+//       "image": "./assets/images/splash.png",
+//       "imageWidth": 200,
+//       "resizeMode": "contain",
+//       "backgroundColor": "#ffffff",
+//       "dark": {
+//         "backgroundColor": "#000000"
+//       }
+//     }
+//   ],
+//   "expo-font"
+// ]
+// ,
+//     "experiments": {
+//       "typedRoutes": true,
+//       "reactCompiler": true
+//     },
+//     "extra": {
+//       "router": {},
+//       "eas": {
+//         "projectId": "08320b13-98f8-4345-8166-10eccacfdd47"
+//       }
+//     },
+//     "owner": "haidernadaf"
+//   }
+// }
+
+
 {
   "expo": {
     "slug": "fields-ops-app",
@@ -8,6 +87,7 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -15,60 +95,70 @@
         "NSCameraUsageDescription": "Camera is required to capture visit photos"
       }
     },
+
     "android": {
-     "permissions": [
-  "ACCESS_FINE_LOCATION",
-  "ACCESS_COARSE_LOCATION",
-  "ACCESS_BACKGROUND_LOCATION",
-  "FOREGROUND_SERVICE",
-  "CAMERA"
-]
-,
-     "adaptiveIcon": {
-    "foregroundImage": "./assets/images/icon.png",
-    "backgroundColor": "#ffffff"
-  },
+      "package": "com.haidernadaf.myApp",
+
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true,
+
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "CAMERA"
+      ],
+
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#ffffff"
+      },
+
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.haidernadaf.myApp"
+      "predictiveBackGestureEnabled": false
     },
+
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-   "plugins": [
-  "expo-router",
-  [
-    "expo-location",
-    {
-      "isAndroidBackgroundLocationEnabled": true
-    }
-  ],
-  [
-    "expo-splash-screen",
-    {
-      "image": "./assets/images/splash.png",
-      "imageWidth": 200,
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
-      "dark": {
-        "backgroundColor": "#000000"
-      }
-    }
-  ],
-  "expo-font"
-]
-,
+
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "backgroundColor": "#000000"
+          }
+        }
+      ],
+      "expo-font"
+    ],
+
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
     },
+
     "extra": {
       "router": {},
       "eas": {
         "projectId": "08320b13-98f8-4345-8166-10eccacfdd47"
       }
     },
+
     "owner": "haidernadaf"
   }
 }
