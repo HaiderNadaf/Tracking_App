@@ -563,6 +563,43 @@ export default function Home() {
 
   const [isTracking, setIsTracking] = useState(false);
 
+  const sendAvailability = async (available: boolean) => {
+    try {
+      console.log("📤 Sending availability:", available);
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Location permission required");
+        return;
+      }
+
+      const loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      const sessionId = await AsyncStorage.getItem("trackingSession");
+
+      if (!sessionId) {
+        console.log("⚠️ No active session — skipping availability");
+        return;
+      }
+
+      await apiFetch("/api/availability/respond", {
+        method: "POST",
+        body: JSON.stringify({
+          sessionId,
+          available,
+          lat: loc.coords.latitude,
+          lng: loc.coords.longitude,
+        }),
+      });
+
+      console.log("✅ Availability sent to backend");
+    } catch (err) {
+      console.error("❌ Availability send failed", err);
+    }
+  };
+
   /* ================= CHECK TRACKING + SYNC OFFLINE ================= */
   useEffect(() => {
     const init = async () => {
@@ -584,8 +621,15 @@ export default function Home() {
         setEndModal(false);
 
         Alert.alert("Availability Check", "Are you available for call?", [
-          { text: "NOT AVAILABLE", style: "cancel" },
-          { text: "AVAILABLE" },
+          {
+            text: "NOT AVAILABLE",
+            style: "cancel",
+            onPress: () => sendAvailability(false),
+          },
+          {
+            text: "AVAILABLE",
+            onPress: () => sendAvailability(true),
+          },
         ]);
       },
     );
@@ -595,14 +639,14 @@ export default function Home() {
 
   //OPTIONAL (Auto popup without tap)
 
-  useEffect(() => {
-    const sub = Notifications.addNotificationReceivedListener(() => {
-      console.log("🔔 Notification received");
-      Alert.alert("Are you available for call?");
-    });
+  // useEffect(() => {
+  //   const sub = Notifications.addNotificationReceivedListener(() => {
+  //     console.log("🔔 Notification received");
+  //     Alert.alert("Are you available for call?");
+  //   });
 
-    return () => sub.remove();
-  }, []);
+  //   return () => sub.remove();
+  // }, []);
 
   /* ================= DATE ================= */
   useEffect(() => {
