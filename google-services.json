@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "24066182853",
+    "project_id": "tracking-310fe",
+    "storage_bucket": "tracking-310fe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24066182853:android:d3f2291264f0162aa3aaac",
+        "android_client_info": {
+          "package_name": "com.haidernadaf.fieldops"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjZPK8zoHMRb04P5Ex0sozHdbGLlsEAC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24066182853:android:f30869ed33cb01dca3aaac",
+        "android_client_info": {
+          "package_name": "com.haidernadaf.myapp.v2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjZPK8zoHMRb04P5Ex0sozHdbGLlsEAC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
