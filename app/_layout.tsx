@@ -24,16 +24,43 @@
 // }
 // import "../tasks/background-location"; // ✅ this actually runs the file
 
-import { Stack } from "expo-router";
-import "../services/backgroundTracking";
+// import { Stack } from "expo-router";
+// import "../services/backgroundTracking";
+
+// export default function RootLayout() {
+//   return (
+//     <Stack screenOptions={{ headerShown: false }}>
+//       <Stack.Screen name="(tabs)" />
+//       <Stack.Screen name="register" />
+//       <Stack.Screen name="login" />
+//       <Stack.Screen name="role/[type]" />
+//     </Stack>
+//   );
+// }
+import { useEffect } from "react";
+import * as Notifications from "expo-notifications";
+import { Slot } from "expo-router";
+import { registerAvailabilityHandler } from "../services/notificationHandler";
 
 export default function RootLayout() {
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="register" />
-      <Stack.Screen name="login" />
-      <Stack.Screen name="role/[type]" />
-    </Stack>
-  );
+  useEffect(() => {
+    Notifications.setNotificationCategoryAsync("AVAILABILITY_ACTION", [
+      {
+        identifier: "YES",
+        buttonTitle: "✅ Available",
+        options: { opensAppToForeground: true },
+      },
+      {
+        identifier: "NO",
+        buttonTitle: "❌ Not Available",
+        options: { opensAppToForeground: true },
+      },
+    ]);
+
+    const sub = registerAvailabilityHandler();
+
+    return () => sub.remove();
+  }, []);
+
+  return <Slot />;
 }
