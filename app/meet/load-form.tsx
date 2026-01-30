@@ -746,6 +746,8 @@ export default function LoadForm() {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const PRODUCT_OPTIONS = ["Maize", "Tender Coconut", "Turmeric", "Banana"];
+
   /* ───────── VALIDATION ───────── */
   const isFormValid = () =>
     aggregator &&
@@ -941,13 +943,31 @@ export default function LoadForm() {
           {/* ───── Load Form ───── */}
           {aggregator && (
             <View style={styles.formCard}>
-              <InputField
-                label="Product"
+              {/* <InputField
+                label="Product Name"
                 value={productName}
                 onChange={setProductName}
-              />
+              /> */}
+              <Text style={styles.label}>Product Name *</Text>
+
+              <View style={styles.dropdownWrapper}>
+                <Picker
+                  selectedValue={productName}
+                  onValueChange={(value) => setProductName(value)}
+                >
+                  <Picker.Item label="Select product" value="" />
+                  {PRODUCT_OPTIONS.map((product) => (
+                    <Picker.Item
+                      key={product}
+                      label={product}
+                      value={product}
+                    />
+                  ))}
+                </Picker>
+              </View>
+
               <InputField
-                label="Vehicles"
+                label="Numbers of Vehicles"
                 value={numberOfVehicles}
                 onChange={setVehicles}
                 keyboardType="numeric"
@@ -955,7 +975,7 @@ export default function LoadForm() {
               <InputField label="From" value={from} onChange={setFrom} />
               <InputField label="To" value={to} onChange={setTo} />
               <InputField
-                label="Price"
+                label="Price of Product"
                 value={pricePaying}
                 onChange={setPrice}
                 keyboardType="numeric"
@@ -1029,6 +1049,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
     color: "#166534",
+  },
+  dropdownWrapper: {
+    borderWidth: 1,
+    borderColor: "#cbd5e1",
+    borderRadius: 10,
+    marginBottom: 12,
+    backgroundColor: "#fff",
   },
 
   formCard: {

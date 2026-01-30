@@ -145,7 +145,32 @@ export default function TabLayout() {
   }
 
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    // <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+
+        // ✅ ACTIVE TAB COLOR
+        tabBarActiveTintColor: "#16a34a", // green
+
+        // ✅ INACTIVE TAB COLOR
+        tabBarInactiveTintColor: "#94a3b8", // gray
+
+        // ✅ TAB BAR BACKGROUND
+        tabBarStyle: {
+          backgroundColor: "#ffffff",
+          borderTopWidth: 1,
+          borderTopColor: "#e5e7eb",
+          height: 64,
+        },
+
+        // ✅ LABEL STYLE
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
