@@ -620,27 +620,6 @@ export default function Home() {
 
   //   return () => sub.remove();
   // }, []);
-  useEffect(() => {
-    const sub = Notifications.addNotificationResponseReceivedListener((res) => {
-      const data = res.notification.request.content.data;
-
-      if (data?.type === "AVAILABILITY") {
-        setAvailabilitySession((data.sessionId as string) || null);
-        setShowAvailability(true);
-      }
-    });
-
-    // 🔥 KILLED STATE
-    Notifications.getLastNotificationResponseAsync().then((res) => {
-      const data = res?.notification?.request?.content?.data;
-      if (data?.type === "AVAILABILITY") {
-        setAvailabilitySession((data.sessionId as string) || null);
-        setShowAvailability(true);
-      }
-    });
-
-    return () => sub.remove();
-  }, []);
 
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener((res) => {
