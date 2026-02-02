@@ -562,6 +562,10 @@ export default function Home() {
   const [imageUri, setImageUri] = useState<string | null>(null);
 
   const [isTracking, setIsTracking] = useState(false);
+  const [showAvailability, setShowAvailability] = useState(false);
+  const [availabilitySession, setAvailabilitySession] = useState<string | null>(
+    null,
+  );
 
   const sendAvailability = async (available: boolean) => {
     try {
@@ -594,11 +598,71 @@ export default function Home() {
         }),
       });
 
+      // ✅ CLOSE POPUP AFTER CLICK
+      setShowAvailability(false);
+      setAvailabilitySession(null);
+
       console.log("✅ Availability sent to backend");
     } catch (err) {
       console.error("❌ Availability send failed", err);
     }
   };
+
+  // useEffect(() => {
+  //   const sub = Notifications.addNotificationReceivedListener((notif) => {
+  //     const data = notif.request.content.data;
+
+  //     if (data?.type === "AVAILABILITY") {
+  //       setAvailabilitySession((data.sessionId as string) || null);
+  //       setShowAvailability(true);
+  //     }
+  //   });
+
+  //   return () => sub.remove();
+  // }, []);
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener((res) => {
+      const data = res.notification.request.content.data;
+
+      if (data?.type === "AVAILABILITY") {
+        setAvailabilitySession((data.sessionId as string) || null);
+        setShowAvailability(true);
+      }
+    });
+
+    // 🔥 KILLED STATE
+    Notifications.getLastNotificationResponseAsync().then((res) => {
+      const data = res?.notification?.request?.content?.data;
+      if (data?.type === "AVAILABILITY") {
+        setAvailabilitySession((data.sessionId as string) || null);
+        setShowAvailability(true);
+      }
+    });
+
+    return () => sub.remove();
+  }, []);
+
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener((res) => {
+      const data = res.notification.request.content.data;
+
+      if (data?.type === "AVAILABILITY") {
+        setAvailabilitySession((data.sessionId as string) || null);
+        setShowAvailability(true);
+      }
+    });
+
+    // 🔥 KILLED STATE
+    Notifications.getLastNotificationResponseAsync().then((res) => {
+      const data = res?.notification?.request?.content?.data;
+      if (data?.type === "AVAILABILITY") {
+        setAvailabilitySession((data.sessionId as string) || null);
+        setShowAvailability(true);
+      }
+    });
+
+    return () => sub.remove();
+  }, []);
 
   /* ================= CHECK TRACKING + SYNC OFFLINE ================= */
   useEffect(() => {
@@ -609,44 +673,6 @@ export default function Home() {
     };
     init();
   }, []);
-
-  /* ================= LISTEN PUSH NOTIFICATION ================= */
-  useEffect(() => {
-    const sub = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
-        console.log("🔔 Notification clicked:", response);
-
-        // open availability popup
-        setStartModal(false);
-        setEndModal(false);
-
-        Alert.alert("Availability Check", "Are you available for call?", [
-          {
-            text: "NOT AVAILABLE",
-            style: "cancel",
-            onPress: () => sendAvailability(false),
-          },
-          {
-            text: "AVAILABLE",
-            onPress: () => sendAvailability(true),
-          },
-        ]);
-      },
-    );
-
-    return () => sub.remove();
-  }, []);
-
-  //OPTIONAL (Auto popup without tap)
-
-  // useEffect(() => {
-  //   const sub = Notifications.addNotificationReceivedListener(() => {
-  //     console.log("🔔 Notification received");
-  //     Alert.alert("Are you available for call?");
-  //   });
-
-  //   return () => sub.remove();
-  // }, []);
 
   /* ================= DATE ================= */
   useEffect(() => {
@@ -769,7 +795,9 @@ export default function Home() {
         return;
       }
 
-      const sessionId = await AsyncStorage.getItem("trackingSession");
+      const sessionId =
+        availabilitySession || (await AsyncStorage.getItem("trackingSession"));
+
       if (!sessionId) return Alert.alert("No active session");
 
       const imageUrl = await uploadToCloudinary(imageUri);
@@ -981,6 +1009,29 @@ export default function Home() {
                 }}
               >
                 <Text style={{ color: "#64748b" }}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        {/* AVAILABILITY MODAL */}
+        <Modal visible={showAvailability} transparent animationType="fade">
+          <View style={styles.modalBg}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>Are you available?</Text>
+
+              <TouchableOpacity
+                style={[styles.confirmBtn, { backgroundColor: "#16a34a" }]}
+                onPress={() => sendAvailability(true)}
+              >
+                <Text style={styles.confirmText}>AVAILABLE</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.confirmBtn, { backgroundColor: "#dc2626" }]}
+                onPress={() => sendAvailability(false)}
+              >
+                <Text style={styles.confirmText}>NOT AVAILABLE</Text>
               </TouchableOpacity>
             </View>
           </View>
