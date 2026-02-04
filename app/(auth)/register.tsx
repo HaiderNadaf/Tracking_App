@@ -941,11 +941,15 @@ export default function Register() {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [role, setRole] = useState<"field_guy" | "agronomist" | null>(null);
+
   // Animations for floating labels
   const nameAnim = useRef(new Animated.Value(0)).current;
   const phoneAnim = useRef(new Animated.Value(0)).current;
 
-  const isFormValid = name.trim().length >= 2 && phone.length === 10;
+  // const isFormValid = name.trim().length >= 2 && phone.length === 10;
+  const isFormValid =
+    name.trim().length >= 2 && phone.length === 10 && role !== null;
 
   useEffect(() => {
     Animated.timing(nameAnim, {
@@ -975,7 +979,7 @@ export default function Register() {
     try {
       await apiFetch("/api/users", {
         method: "POST",
-        body: JSON.stringify({ name: name.trim(), phone, role: "field_guy" }),
+        body: JSON.stringify({ name: name.trim(), phone, role }),
       });
 
       Alert.alert(
@@ -1052,7 +1056,7 @@ export default function Register() {
                   style={[styles.input, name.length > 0 && styles.inputFilled]}
                   value={name}
                   onChangeText={setName}
-                  placeholder={name.length === 0 ? "Enter your name" : ""}
+                  placeholder={name.length === 0 ? "Enter your names" : ""}
                   placeholderTextColor="#a0aec0"
                   autoCapitalize="words"
                   autoCorrect={false}
@@ -1083,6 +1087,47 @@ export default function Register() {
                   returnKeyType="done"
                   autoCorrect={false}
                 />
+              </View>
+
+              {/* Role Selection */}
+              <View style={styles.roleContainer}>
+                <Text style={styles.roleLabel}>I am a</Text>
+
+                <View style={styles.roleButtons}>
+                  <TouchableOpacity
+                    style={[
+                      styles.roleButton,
+                      role === "field_guy" && styles.roleActive,
+                    ]}
+                    onPress={() => setRole("field_guy")}
+                  >
+                    <Text
+                      style={[
+                        styles.roleText,
+                        role === "field_guy" && styles.roleTextActive,
+                      ]}
+                    >
+                      Field Guy
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.roleButton,
+                      role === "agronomist" && styles.roleActive,
+                    ]}
+                    onPress={() => setRole("agronomist")}
+                  >
+                    <Text
+                      style={[
+                        styles.roleText,
+                        role === "agronomist" && styles.roleTextActive,
+                      ]}
+                    >
+                      Agronomist
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
 
               {/* Button */}
@@ -1140,6 +1185,46 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     paddingTop: height > 800 ? 60 : 40,
     paddingBottom: 40,
+  },
+  roleContainer: {
+    gap: 10,
+  },
+
+  roleLabel: {
+    fontSize: 15,
+    color: "#475569",
+    fontWeight: "500",
+  },
+
+  roleButtons: {
+    flexDirection: "row",
+    gap: 12,
+  },
+
+  roleButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: "#e2e8f0",
+    backgroundColor: "#fff",
+    alignItems: "center",
+  },
+
+  roleActive: {
+    borderColor: "#16a34a",
+    backgroundColor: "#dcfce7",
+  },
+
+  roleText: {
+    fontSize: 15.5,
+    color: "#334155",
+    fontWeight: "500",
+  },
+
+  roleTextActive: {
+    color: "#166534",
+    fontWeight: "600",
   },
 
   header: {
