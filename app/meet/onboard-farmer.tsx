@@ -973,6 +973,7 @@ export default function OnboardFarmer() {
       <TextInput
         style={styles.input}
         placeholder="Farmer Name *"
+        placeholderTextColor="#94a3b8"
         value={name}
         onChangeText={setName}
       />
@@ -980,24 +981,37 @@ export default function OnboardFarmer() {
       <TextInput
         style={styles.input}
         placeholder="Phone Number *"
+        placeholderTextColor="#94a3b8"
         value={phone}
         onChangeText={setPhone}
         keyboardType="phone-pad"
       />
 
       <View style={styles.pickerBox}>
-        <Picker selectedValue={cropType} onValueChange={setCropType}>
-          <Picker.Item label="Select Crop *" value="" />
-          <Picker.Item label="Banana" value="Banana" />
-          <Picker.Item label="Dry Coconut" value="Dry Coconut" />
-          <Picker.Item label="Tender Coconut" value="Tender Coconut" />
-          <Picker.Item label="Turmeric" value="Turmeric" />
+        <Picker
+          selectedValue={cropType}
+          onValueChange={setCropType}
+          style={{ color: cropType === "" ? "black" : "#000" }}
+        >
+          <Picker.Item label="Select Crop *" value="" color="black" />
+          <Picker.Item label="Banana" value="Banana" color="black" />
+          <Picker.Item label="Dry Coconut" value="Dry Coconut" color="black" />
+          <Picker.Item
+            label="Tender Coconut"
+            value="Tender Coconut"
+            color="black"
+          />
+          <Picker.Item label="Turmeric" value="Turmeric" color="black" />
         </Picker>
       </View>
 
       <View style={styles.pickerBox}>
-        <Picker selectedValue={state} onValueChange={setState}>
-          <Picker.Item label="Select State (Optional)" value="" />
+        <Picker
+          selectedValue={state}
+          onValueChange={setState}
+          style={{ color: cropType === "" ? "black" : "#000" }}
+        >
+          <Picker.Item label="Select State (Optional)" value="" color="black" />
           {states.map((s) => (
             <Picker.Item key={s} label={s} value={s} />
           ))}
@@ -1010,7 +1024,11 @@ export default function OnboardFarmer() {
           onValueChange={setDistrict}
           enabled={!!state}
         >
-          <Picker.Item label="Select District (Optional)" value="" />
+          <Picker.Item
+            label="Select District (Optional)"
+            value=""
+            color="#94a3b8"
+          />
           {districts.map((d) => (
             <Picker.Item key={d} label={d} value={d} />
           ))}
@@ -1023,7 +1041,11 @@ export default function OnboardFarmer() {
           onValueChange={setTaluk}
           enabled={!!district}
         >
-          <Picker.Item label="Select Taluk (Optional)" value="" />
+          <Picker.Item
+            label="Select Taluk (Optional)"
+            value=""
+            color="#94a3b8"
+          />
           {taluks.map((t) => (
             <Picker.Item key={t} label={t} value={t} />
           ))}
@@ -1036,7 +1058,11 @@ export default function OnboardFarmer() {
           onValueChange={setVillage}
           enabled={!!taluk}
         >
-          <Picker.Item label="Select Village (Optional)" value="" />
+          <Picker.Item
+            label="Select Village (Optional)"
+            value=""
+            color="#94a3b8"
+          />
           {villages.map((v) => (
             <Picker.Item key={v} label={v} value={v} />
           ))}
@@ -1046,6 +1072,7 @@ export default function OnboardFarmer() {
       <TextInput
         style={styles.input}
         placeholder="Land Size (acres)"
+        placeholderTextColor="#94a3b8"
         value={landSize}
         onChangeText={setLandSize}
         keyboardType="numeric"
@@ -1054,6 +1081,7 @@ export default function OnboardFarmer() {
       <TextInput
         style={styles.input}
         placeholder="Crop Cost (₹)"
+        placeholderTextColor="#94a3b8"
         value={cropCost}
         onChangeText={setCropCost}
       />
@@ -1061,11 +1089,12 @@ export default function OnboardFarmer() {
       <TextInput
         style={styles.input}
         placeholder="Input Supplier"
+        placeholderTextColor="#94a3b8"
         value={inputSupplier}
         onChangeText={setInputSupplier}
       />
 
-      <View style={styles.row}>
+      {/* <View style={styles.row}>
         <Text>Payment Type</Text>
         <Picker
           selectedValue={paymentType}
@@ -1075,18 +1104,48 @@ export default function OnboardFarmer() {
           <Picker.Item label="Cash" value="cash" />
           <Picker.Item label="Credit" value="credit" />
         </Picker>
+      </View> */}
+      <View style={styles.row}>
+        <Text style={{ color: "#000" }}>Payment Type</Text>
+
+        <Picker
+          selectedValue={paymentType}
+          onValueChange={(v) => setPaymentType(v as "cash" | "credit")}
+          style={{
+            flex: 1,
+            color: "black",
+          }}
+        >
+          <Picker.Item label="Select Payment Type *" value="" color="black" />
+          <Picker.Item label="Cash" value="cash" color="black" />
+          <Picker.Item label="Credit" value="credit" color="black" />
+        </Picker>
       </View>
 
       <View style={styles.row}>
-        <Text>Drone Spraying Consent (₹500/acre)</Text>
-        <Switch value={droneConsent} onValueChange={setDroneConsent} />
+        <Text style={{ color: "#000" }}>
+          Drone Spraying Consent (₹500/acre)
+        </Text>
+        {/* <Switch value={droneConsent} onValueChange={setDroneConsent} /> */}
+        <Switch
+          value={droneConsent}
+          onValueChange={setDroneConsent}
+          trackColor={{ false: "#94a3b8", true: "#22c55e" }} // gray → green
+          thumbColor={droneConsent ? "#16a34a" : "#f4f4f5"} // knob color
+        />
       </View>
 
       <View style={styles.row}>
-        <Text>Agronomist Care Consent</Text>
+        <Text style={{ color: "#000" }}>Agronomist Care Consent</Text>
+        {/* <Switch
+          value={agronomistConsent}
+          onValueChange={setAgronomistConsent}
+        /> */}
         <Switch
           value={agronomistConsent}
           onValueChange={setAgronomistConsent}
+          trackColor={{ false: "#94a3b8", true: "#22c55e" }} // gray → green
+          thumbColor={agronomistConsent ? "#16a34a" : "#f4f4f5"} // knob color
         />
       </View>
 
