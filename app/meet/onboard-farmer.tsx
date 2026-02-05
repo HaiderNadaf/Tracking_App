@@ -1,660 +1,3 @@
-// import {
-//   StyleSheet,
-//   Text,
-//   View,
-//   TextInput,
-//   TouchableOpacity,
-//   Alert,
-//   ActivityIndicator,
-//   ScrollView,
-// } from "react-native";
-// import React, { useEffect, useState } from "react";
-// import { Picker } from "@react-native-picker/picker";
-// import { apiFetch } from "../../services/api";
-
-// const API_BASE = "https://markhet-internal-ngfs.onrender.com";
-
-// const OnboardFarmer = () => {
-//   const [loading, setLoading] = useState(false);
-
-//   /* ================= FORM ================= */
-//   const [name, setName] = useState("");
-//   const [phone, setPhone] = useState("");
-//   const [cropType, setCropType] = useState("");
-//   const [landSize, setLandSize] = useState("");
-
-//   /* ================= LOCATION ================= */
-//   const [state, setState] = useState("");
-//   const [district, setDistrict] = useState("");
-//   const [taluk, setTaluk] = useState("");
-//   const [village, setVillage] = useState("");
-
-//   const [states, setStates] = useState<string[]>([]);
-//   const [districts, setDistricts] = useState<string[]>([]);
-//   const [taluks, setTaluks] = useState<string[]>([]);
-//   const [villages, setVillages] = useState<string[]>([]);
-
-//   /* ================= FETCH STATES ================= */
-//   useEffect(() => {
-//     fetch(`${API_BASE}/newlocations/states`)
-//       .then((r) => r.json())
-//       .then((j) => setStates(j.data || []))
-//       .catch(console.log);
-//   }, []);
-
-//   /* ================= FETCH DISTRICTS ================= */
-//   useEffect(() => {
-//     if (!state) return;
-
-//     setDistrict("");
-//     setTaluk("");
-//     setVillage("");
-//     setDistricts([]);
-//     setTaluks([]);
-//     setVillages([]);
-
-//     fetch(`${API_BASE}/newlocations/districts?state=${state}`)
-//       .then((r) => r.json())
-//       .then((j) => setDistricts(j.data || []))
-//       .catch(console.log);
-//   }, [state]);
-
-//   /* ================= FETCH TALUKS ================= */
-//   useEffect(() => {
-//     if (!district) return;
-
-//     setTaluk("");
-//     setVillage("");
-//     setTaluks([]);
-//     setVillages([]);
-
-//     fetch(`${API_BASE}/newlocations/taluks?state=${state}&district=${district}`)
-//       .then((r) => r.json())
-//       .then((j) => setTaluks(j.data || []))
-//       .catch(console.log);
-//   }, [district]);
-
-//   /* ================= FETCH VILLAGES ================= */
-//   useEffect(() => {
-//     if (!taluk) return;
-
-//     setVillage("");
-//     setVillages([]);
-
-//     fetch(
-//       `${API_BASE}/newlocations/villages?state=${state}&district=${district}&taluk=${taluk}`,
-//     )
-//       .then((r) => r.json())
-//       .then((j) => setVillages(j.data || []))
-//       .catch(console.log);
-//   }, [taluk]);
-
-//   /* ================= SUBMIT ================= */
-//   const handleSubmit = async () => {
-//     if (
-//       !name ||
-//       !phone ||
-//       !cropType ||
-//       !state ||
-//       !district ||
-//       !taluk ||
-//       !village
-//     ) {
-//       Alert.alert("Missing Fields", "Please fill all required fields");
-//       return;
-//     }
-
-//     if (loading) return;
-
-//     try {
-//       setLoading(true);
-
-//       // apiFetch already returns parsed JSON
-//       await apiFetch(`/api/farmer/onboard`, {
-//         method: "POST",
-//         body: JSON.stringify({
-//           name,
-//           phone,
-//           cropType,
-//           state,
-//           district,
-//           taluk,
-//           village,
-//           landSize: Number(landSize),
-//         }),
-//       });
-
-//       Alert.alert("Success", "Farmer onboarded successfully");
-
-//       // Reset form
-//       setName("");
-//       setPhone("");
-//       setCropType("");
-//       setState("");
-//       setDistrict("");
-//       setTaluk("");
-//       setVillage("");
-//       setLandSize("");
-//     } catch (e: any) {
-//       Alert.alert("Submission Failed", e?.message || "Something went wrong");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   /* ================= UI ================= */
-//   return (
-//     <ScrollView contentContainerStyle={styles.container}>
-//       <Text style={styles.title}>Onboard Farmer</Text>
-
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Farmer Name *"
-//         value={name}
-//         onChangeText={setName}
-//       />
-
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Phone Number *"
-//         keyboardType="number-pad"
-//         value={phone}
-//         onChangeText={setPhone}
-//       />
-
-//       <View style={styles.pickerBox}>
-//         <Picker selectedValue={cropType} onValueChange={setCropType}>
-//           <Picker.Item label="Select Crop *" value="" />
-//           <Picker.Item label="Banana" value="Banana" />
-//           <Picker.Item label="Dry Coconut" value="Dry Coconut" />
-//           <Picker.Item label="Tender Coconut" value="Tender Coconut" />
-//           <Picker.Item label="Turmeric" value="Turmeric" />
-//         </Picker>
-//       </View>
-
-//       <View style={styles.pickerBox}>
-//         <Picker selectedValue={state} onValueChange={setState}>
-//           <Picker.Item label="Select State *" value="" />
-//           {states.map((s) => (
-//             <Picker.Item key={s} label={s} value={s} />
-//           ))}
-//         </Picker>
-//       </View>
-
-//       <View style={styles.pickerBox}>
-//         <Picker selectedValue={district} onValueChange={setDistrict}>
-//           <Picker.Item label="Select District *" value="" />
-//           {districts.map((d) => (
-//             <Picker.Item key={d} label={d} value={d} />
-//           ))}
-//         </Picker>
-//       </View>
-
-//       <View style={styles.pickerBox}>
-//         <Picker selectedValue={taluk} onValueChange={setTaluk}>
-//           <Picker.Item label="Select Taluk *" value="" />
-//           {taluks.map((t) => (
-//             <Picker.Item key={t} label={t} value={t} />
-//           ))}
-//         </Picker>
-//       </View>
-
-//       <View style={styles.pickerBox}>
-//         <Picker selectedValue={village} onValueChange={setVillage}>
-//           <Picker.Item label="Select Village *" value="" />
-//           {villages.map((v) => (
-//             <Picker.Item key={v} label={v} value={v} />
-//           ))}
-//         </Picker>
-//       </View>
-
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Land Size (Acres)"
-//         keyboardType="decimal-pad"
-//         value={landSize}
-//         onChangeText={setLandSize}
-//       />
-
-//       <TouchableOpacity
-//         style={[styles.button, loading && { opacity: 0.7 }]}
-//         onPress={handleSubmit}
-//         disabled={loading}
-//       >
-//         {loading ? (
-//           <ActivityIndicator color="#fff" />
-//         ) : (
-//           <Text style={styles.buttonText}>Submit</Text>
-//         )}
-//       </TouchableOpacity>
-//     </ScrollView>
-//   );
-// };
-
-// export default OnboardFarmer;
-
-// /* ================= STYLES ================= */
-// const styles = StyleSheet.create({
-//   container: {
-//     padding: 20,
-//     backgroundColor: "#f9fafb",
-//   },
-//   title: {
-//     fontSize: 22,
-//     fontWeight: "700",
-//     marginBottom: 20,
-//     textAlign: "center",
-//   },
-//   input: {
-//     backgroundColor: "#fff",
-//     padding: 14,
-//     borderRadius: 8,
-//     marginBottom: 12,
-//     borderWidth: 1,
-//     borderColor: "#e5e7eb",
-//   },
-//   pickerBox: {
-//     backgroundColor: "#fff",
-//     borderRadius: 8,
-//     borderWidth: 1,
-//     borderColor: "#e5e7eb",
-//     marginBottom: 12,
-//   },
-//   button: {
-//     backgroundColor: "#16a34a",
-//     padding: 16,
-//     borderRadius: 10,
-//     alignItems: "center",
-//     marginTop: 10,
-//   },
-//   buttonText: {
-//     color: "#fff",
-//     fontSize: 16,
-//     fontWeight: "600",
-//   },
-// });
-
-// import {
-//   StyleSheet,
-//   Text,
-//   View,
-//   TextInput,
-//   TouchableOpacity,
-//   Alert,
-//   ActivityIndicator,
-//   ScrollView,
-//   Switch,
-//   Image,
-// } from "react-native";
-// import React, { useEffect, useState } from "react";
-// import { useRouter } from "expo-router";
-// import { Picker } from "@react-native-picker/picker";
-// import * as Location from "expo-location";
-// import * as ImagePicker from "expo-image-picker";
-// import { apiFetch } from "../../services/api";
-
-// const API_BASE = "https://markhet-internal-ngfs.onrender.com";
-
-// const OnboardFarmer = () => {
-//   const router = useRouter();
-//   const [loading, setLoading] = useState(false);
-
-//   /* ================= BASIC ================= */
-//   const [name, setName] = useState("");
-//   const [phone, setPhone] = useState("");
-//   const [cropType, setCropType] = useState("");
-//   const [landSize, setLandSize] = useState("");
-
-//   /* ================= EXTRA QUESTIONS ================= */
-//   const [cropCost, setCropCost] = useState("");
-//   const [inputSupplier, setInputSupplier] = useState("");
-//   const [paymentType, setPaymentType] = useState<"cash" | "credit">("cash");
-//   const [droneConsent, setDroneConsent] = useState(false);
-//   const [agronomistConsent, setAgronomistConsent] = useState(false);
-
-//   /* ================= LOCATION (DROPDOWN) ================= */
-//   const [state, setState] = useState("");
-//   const [district, setDistrict] = useState("");
-//   const [taluk, setTaluk] = useState("");
-//   const [village, setVillage] = useState("");
-
-//   const [states, setStates] = useState<string[]>([]);
-//   const [districts, setDistricts] = useState<string[]>([]);
-//   const [taluks, setTaluks] = useState<string[]>([]);
-//   const [villages, setVillages] = useState<string[]>([]);
-
-//   /* ================= GPS + PHOTO ================= */
-//   const [location, setLocation] = useState<any>(null);
-//   const [photo, setPhoto] = useState<string | null>(null);
-
-//   /* ================= FETCH STATES ================= */
-//   useEffect(() => {
-//     fetch(`${API_BASE}/newlocations/states`)
-//       .then((r) => r.json())
-//       .then((j) => setStates(j.data || []))
-//       .catch(console.log);
-//   }, []);
-
-//   /* ================= FETCH DISTRICTS ================= */
-//   useEffect(() => {
-//     if (!state) return;
-
-//     setDistrict("");
-//     setTaluk("");
-//     setVillage("");
-//     setDistricts([]);
-//     setTaluks([]);
-//     setVillages([]);
-
-//     fetch(`${API_BASE}/newlocations/districts?state=${state}`)
-//       .then((r) => r.json())
-//       .then((j) => setDistricts(j.data || []))
-//       .catch(console.log);
-//   }, [state]);
-
-//   /* ================= FETCH TALUKS ================= */
-//   useEffect(() => {
-//     if (!district) return;
-
-//     setTaluk("");
-//     setVillage("");
-//     setTaluks([]);
-//     setVillages([]);
-
-//     fetch(`${API_BASE}/newlocations/taluks?state=${state}&district=${district}`)
-//       .then((r) => r.json())
-//       .then((j) => setTaluks(j.data || []))
-//       .catch(console.log);
-//   }, [district]);
-
-//   /* ================= FETCH VILLAGES ================= */
-//   useEffect(() => {
-//     if (!taluk) return;
-
-//     setVillage("");
-//     setVillages([]);
-
-//     fetch(
-//       `${API_BASE}/newlocations/villages?state=${state}&district=${district}&taluk=${taluk}`,
-//     )
-//       .then((r) => r.json())
-//       .then((j) => setVillages(j.data || []))
-//       .catch(console.log);
-//   }, [taluk]);
-
-//   /* ================= GPS ================= */
-//   const getLocation = async () => {
-//     const { status } = await Location.requestForegroundPermissionsAsync();
-//     if (status !== "granted") {
-//       Alert.alert("Permission denied");
-//       return;
-//     }
-
-//     const loc = await Location.getCurrentPositionAsync({});
-//     setLocation({
-//       latitude: loc.coords.latitude,
-//       longitude: loc.coords.longitude,
-//     });
-
-//     Alert.alert("Location captured");
-//   };
-
-//   /* ================= PHOTO ================= */
-//   const pickPhoto = async () => {
-//     const res = await ImagePicker.launchCameraAsync({ quality: 0.5 });
-//     if (!res.canceled) setPhoto(res.assets[0].uri);
-//   };
-
-//   /* ================= SUBMIT ================= */
-//   const handleSubmit = async () => {
-//     if (
-//       !name ||
-//       !phone ||
-//       !cropType ||
-//       !state ||
-//       !district ||
-//       !taluk ||
-//       !village
-//     ) {
-//       Alert.alert("Missing Fields", "Please fill all required fields");
-//       router.replace("/(tabs)");
-//       return;
-//     }
-
-//     try {
-//       setLoading(true);
-
-//       await apiFetch(`/api/farmer/onboard`, {
-//         method: "POST",
-//         body: JSON.stringify({
-//           name,
-//           phone,
-//           cropType,
-//           state,
-//           district,
-//           taluk,
-//           village,
-//           landSize: Number(landSize),
-
-//           cropCost: Number(cropCost),
-//           inputSupplier,
-//           paymentType,
-//           droneSprayingConsent: droneConsent,
-//           agronomistCareConsent: agronomistConsent,
-
-//           location,
-//           photo,
-//         }),
-//       });
-
-//       Alert.alert("Success", "Farmer onboarded successfully");
-//       router.replace("/(tabs)");
-//     } catch (e: any) {
-//       Alert.alert("Failed", e?.message || "Something went wrong");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   /* ================= UI ================= */
-//   return (
-//     <ScrollView contentContainerStyle={styles.container}>
-//       <Text style={styles.title}>Onboard Farmer</Text>
-
-//       {/* BASIC */}
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Farmer Name *"
-//         value={name}
-//         onChangeText={setName}
-//       />
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Phone Number *"
-//         value={phone}
-//         onChangeText={setPhone}
-//       />
-
-//       {/* CROP */}
-//       <View style={styles.pickerBox}>
-//         <Picker selectedValue={cropType} onValueChange={setCropType}>
-//           <Picker.Item label="Select Crop *" value="" />
-//           <Picker.Item label="Banana" value="Banana" />
-//           <Picker.Item label="Dry Coconut" value="Dry Coconut" />
-//           <Picker.Item label="Tender Coconut" value="Tender Coconut" />
-//           <Picker.Item label="Turmeric" value="Turmeric" />
-//         </Picker>
-//       </View>
-
-//       {/* LOCATION DROPDOWNS */}
-//       <View style={styles.pickerBox}>
-//         <Picker selectedValue={state} onValueChange={setState}>
-//           <Picker.Item label="Select State *" value="" />
-//           {states.map((s) => (
-//             <Picker.Item key={s} label={s} value={s} />
-//           ))}
-//         </Picker>
-//       </View>
-
-//       <View style={styles.pickerBox}>
-//         <Picker
-//           selectedValue={district}
-//           onValueChange={setDistrict}
-//           enabled={!!state}
-//         >
-//           <Picker.Item label="Select District *" value="" />
-//           {districts.map((d) => (
-//             <Picker.Item key={d} label={d} value={d} />
-//           ))}
-//         </Picker>
-//       </View>
-
-//       <View style={styles.pickerBox}>
-//         <Picker
-//           selectedValue={taluk}
-//           onValueChange={setTaluk}
-//           enabled={!!district}
-//         >
-//           <Picker.Item label="Select Taluk *" value="" />
-//           {taluks.map((t) => (
-//             <Picker.Item key={t} label={t} value={t} />
-//           ))}
-//         </Picker>
-//       </View>
-
-//       <View style={styles.pickerBox}>
-//         <Picker
-//           selectedValue={village}
-//           onValueChange={setVillage}
-//           enabled={!!taluk}
-//         >
-//           <Picker.Item label="Select Village *" value="" />
-//           {villages.map((v) => (
-//             <Picker.Item key={v} label={v} value={v} />
-//           ))}
-//         </Picker>
-//       </View>
-
-//       {/* EXTRA */}
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Land Size (Acres)"
-//         value={landSize}
-//         onChangeText={setLandSize}
-//       />
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Crop Cost"
-//         value={cropCost}
-//         onChangeText={setCropCost}
-//       />
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Input Supplier"
-//         value={inputSupplier}
-//         onChangeText={setInputSupplier}
-//       />
-
-//       <View style={styles.row}>
-//         <Text>Payment Type</Text>
-//         <Picker
-//           selectedValue={paymentType}
-//           onValueChange={setPaymentType}
-//           style={{ flex: 1 }}
-//         >
-//           <Picker.Item label="Cash" value="cash" />
-//           <Picker.Item label="Credit" value="credit" />
-//         </Picker>
-//       </View>
-
-//       <View style={styles.row}>
-//         <Text>Drone Spraying (₹500/acre)</Text>
-//         <Switch value={droneConsent} onValueChange={setDroneConsent} />
-//       </View>
-
-//       <View style={styles.row}>
-//         <Text>Agronomist Care (A–Z)</Text>
-//         <Switch
-//           value={agronomistConsent}
-//           onValueChange={setAgronomistConsent}
-//         />
-//       </View>
-
-//       <TouchableOpacity style={styles.button} onPress={getLocation}>
-//         <Text style={styles.buttonText}>Capture Location</Text>
-//       </TouchableOpacity>
-
-//       <TouchableOpacity style={styles.button} onPress={pickPhoto}>
-//         <Text style={styles.buttonText}>Take Photo</Text>
-//       </TouchableOpacity>
-
-//       {photo && (
-//         <Image
-//           source={{ uri: photo }}
-//           style={{ height: 180, borderRadius: 8 }}
-//         />
-//       )}
-
-//       <TouchableOpacity style={styles.submit} onPress={handleSubmit}>
-//         {loading ? (
-//           <ActivityIndicator color="#fff" />
-//         ) : (
-//           <Text style={styles.buttonText}>Submit</Text>
-//         )}
-//       </TouchableOpacity>
-//     </ScrollView>
-//   );
-// };
-
-// export default OnboardFarmer;
-
-// /* ================= STYLES ================= */
-// const styles = StyleSheet.create({
-//   container: { padding: 20, backgroundColor: "#f9fafb" },
-//   title: {
-//     fontSize: 22,
-//     fontWeight: "700",
-//     marginBottom: 20,
-//     textAlign: "center",
-//   },
-//   input: {
-//     backgroundColor: "#fff",
-//     padding: 14,
-//     borderRadius: 8,
-//     marginBottom: 12,
-//     borderWidth: 1,
-//     borderColor: "#e5e7eb",
-//   },
-//   pickerBox: {
-//     backgroundColor: "#fff",
-//     borderRadius: 8,
-//     borderWidth: 1,
-//     borderColor: "#e5e7eb",
-//     marginBottom: 12,
-//   },
-//   row: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     justifyContent: "space-between",
-//     marginBottom: 12,
-//   },
-//   button: {
-//     backgroundColor: "#2563eb",
-//     padding: 14,
-//     borderRadius: 10,
-//     alignItems: "center",
-//     marginBottom: 12,
-//   },
-//   submit: {
-//     backgroundColor: "#16a34a",
-//     padding: 16,
-//     borderRadius: 10,
-//     alignItems: "center",
-//     marginTop: 10,
-//   },
-//   buttonText: { color: "#fff", fontWeight: "600" },
-// });
-
 import {
   StyleSheet,
   Text,
@@ -862,8 +205,23 @@ export default function OnboardFarmer() {
 
   // ─── Submit form ────────────────────────────────────────
   const handleSubmit = async () => {
-    if (!name.trim() || !phone.trim() || !cropType) {
-      Alert.alert("Incomplete", "Please fill all required fields.");
+    // if (!name.trim() || !phone.trim() || !cropType) {
+    //   Alert.alert("Incomplete", "Please fill all required fields.");
+    //   return;
+    // }
+
+    const missingFields: string[] = [];
+
+    if (!name.trim()) missingFields.push("Farmer Name");
+    if (!phone.trim()) missingFields.push("Phone Number");
+    if (!cropType) missingFields.push("Crop Type");
+    if (!paymentType) missingFields.push("Payment Type");
+
+    if (missingFields.length > 0) {
+      Alert.alert(
+        "Required Fields Missing",
+        `Please fill:\n\n• ${missingFields.join("\n• ")}`,
+      );
       return;
     }
 
@@ -987,7 +345,7 @@ export default function OnboardFarmer() {
         keyboardType="phone-pad"
       />
 
-      <View style={styles.pickerBox}>
+      {/* <View style={styles.pickerBox}>
         <Picker
           selectedValue={cropType}
           onValueChange={setCropType}
@@ -1065,6 +423,97 @@ export default function OnboardFarmer() {
           />
           {villages.map((v) => (
             <Picker.Item key={v} label={v} value={v} />
+          ))}
+        </Picker>
+      </View> */}
+
+      {/* Crop Type */}
+      <View style={styles.pickerBox}>
+        <Picker
+          selectedValue={cropType}
+          onValueChange={setCropType}
+          style={{ color: "black" }}
+          dropdownIconColor="black"
+        >
+          <Picker.Item label="Select Crop *" value="" color="black" />
+          <Picker.Item label="Banana" value="Banana" color="black" />
+          <Picker.Item label="Dry Coconut" value="Dry Coconut" color="black" />
+          <Picker.Item
+            label="Tender Coconut"
+            value="Tender Coconut"
+            color="black"
+          />
+          <Picker.Item label="Turmeric" value="Turmeric" color="black" />
+        </Picker>
+      </View>
+
+      {/* State */}
+      <View style={styles.pickerBox}>
+        <Picker
+          selectedValue={state}
+          onValueChange={setState}
+          style={{ color: "black" }}
+          dropdownIconColor="black"
+        >
+          <Picker.Item label="Select State (Optional)" value="" color="black" />
+          {states.map((s) => (
+            <Picker.Item key={s} label={s} value={s} color="black" />
+          ))}
+        </Picker>
+      </View>
+
+      {/* District */}
+      <View style={styles.pickerBox}>
+        <Picker
+          selectedValue={district}
+          onValueChange={setDistrict}
+          enabled={!!state}
+          style={{ color: "black" }}
+          dropdownIconColor="black"
+        >
+          <Picker.Item
+            label="Select District (Optional)"
+            value=""
+            color="black"
+          />
+          {districts.map((d) => (
+            <Picker.Item key={d} label={d} value={d} color="black" />
+          ))}
+        </Picker>
+      </View>
+
+      {/* Taluk */}
+      <View style={styles.pickerBox}>
+        <Picker
+          selectedValue={taluk}
+          onValueChange={setTaluk}
+          enabled={!!district}
+          style={{ color: "black" }}
+          dropdownIconColor="black"
+        >
+          <Picker.Item label="Select Taluk (Optional)" value="" color="black" />
+          {taluks.map((t) => (
+            <Picker.Item key={t} label={t} value={t} color="black" />
+          ))}
+        </Picker>
+      </View>
+
+      {/* Village */}
+      <View style={styles.pickerBox}>
+        <Picker
+          selectedValue={village}
+          onValueChange={setVillage}
+          enabled={!!taluk}
+          style={{ color: "black" }}
+          dropdownIconColor="black"
+        >
+          <Picker.Item
+            label="Select Village (Optional)"
+            value=""
+            color="black"
+          />
+          {villages.map((v) => (
+            <Picker.Item key={v} label={v} value={v} color="black" />
           ))}
         </Picker>
       </View>
@@ -1269,6 +718,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     overflow: "hidden",
   },
+  picker: {
+    color: "black",
+  },
+
   row: {
     flexDirection: "row",
     alignItems: "center",

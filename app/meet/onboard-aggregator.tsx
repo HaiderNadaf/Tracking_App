@@ -203,19 +203,41 @@ export default function OnboardAggregator() {
   }, [taluk]);
 
   const submit = async () => {
-    if (
-      !name ||
-      !mobileNumber ||
-      !state ||
-      !district ||
-      !taluk ||
-      !village ||
-      !productDealing ||
-      !selfie ||
-      !storeImage ||
-      !location
-    ) {
-      Alert.alert("Fill all required fields");
+    // if (
+    //   !name ||
+    //   !mobileNumber ||
+    //   !state ||
+    //   !district ||
+    //   !taluk ||
+    //   !village ||
+    //   !productDealing ||
+    //   !selfie ||
+    //   !storeImage ||
+    //   !location
+    // ) {
+    //   Alert.alert("Fill all required fields");
+    //   return;
+    // }
+
+    const missingFields: string[] = [];
+
+    if (!name.trim()) missingFields.push("Name");
+    if (!mobileNumber.trim()) missingFields.push("Mobile Number");
+    if (!state) missingFields.push("State");
+    if (!district) missingFields.push("District");
+    if (!taluk) missingFields.push("Taluk");
+    if (!village) missingFields.push("Village");
+    if (!productDealing.trim()) missingFields.push("Product Dealing");
+    if (!selfie) missingFields.push("Selfie Photo");
+    if (!storeImage) missingFields.push("Store Photo");
+    if (!location?.latitude || !location?.longitude)
+      missingFields.push("Location");
+
+    if (missingFields.length > 0) {
+      Alert.alert(
+        "Required Fields Missing",
+        `Please fill:\n\n• ${missingFields.join("\n• ")}`,
+      );
       return;
     }
 
@@ -322,7 +344,7 @@ export default function OnboardAggregator() {
             onChangeText={setAadharNo}
             keyboardType="numeric"
           />
-
+          {/* 
           <Picker selectedValue={state} onValueChange={setState}>
             <Picker.Item label="Select State" value="" color="black" />
             {states.map((s) => (
@@ -349,7 +371,78 @@ export default function OnboardAggregator() {
             {villages.map((v) => (
               <Picker.Item key={v} label={v} value={v} />
             ))}
-          </Picker>
+          </Picker> */}
+
+          <View style={styles.pickerBox}>
+            <Picker
+              selectedValue={state}
+              onValueChange={(val) => {
+                setState(val);
+                setDistrict("");
+                setTaluk("");
+                setVillage("");
+              }}
+              style={styles.picker}
+              dropdownIconColor="black"
+            >
+              <Picker.Item label="Select State" value="" color="black" />
+              {states.map((s) => (
+                <Picker.Item key={s} label={s} value={s} color="black" />
+              ))}
+            </Picker>
+          </View>
+
+          <View style={styles.pickerBox}>
+            <Picker
+              selectedValue={district}
+              onValueChange={(val) => {
+                setDistrict(val);
+                setTaluk("");
+                setVillage("");
+              }}
+              enabled={!!state}
+              style={styles.picker}
+              dropdownIconColor="black"
+            >
+              <Picker.Item label="Select District" value="" color="black" />
+              {districts.map((d) => (
+                <Picker.Item key={d} label={d} value={d} color="black" />
+              ))}
+            </Picker>
+          </View>
+
+          <View style={styles.pickerBox}>
+            <Picker
+              selectedValue={taluk}
+              onValueChange={(val) => {
+                setTaluk(val);
+                setVillage("");
+              }}
+              enabled={!!district}
+              style={styles.picker}
+              dropdownIconColor="black"
+            >
+              <Picker.Item label="Select Taluk" value="" color="black" />
+              {taluks.map((t) => (
+                <Picker.Item key={t} label={t} value={t} color="black" />
+              ))}
+            </Picker>
+          </View>
+
+          <View style={styles.pickerBox}>
+            <Picker
+              selectedValue={village}
+              onValueChange={setVillage}
+              enabled={!!taluk}
+              style={styles.picker}
+              dropdownIconColor="black"
+            >
+              <Picker.Item label="Select Village" value="" color="black" />
+              {villages.map((v) => (
+                <Picker.Item key={v} label={v} value={v} color="black" />
+              ))}
+            </Picker>
+          </View>
 
           <TextInput
             style={styles.input}
@@ -466,6 +559,20 @@ const styles = StyleSheet.create({
     color: "black",
     marginBottom: 16,
   },
+  pickerBox: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    marginBottom: 12,
+    justifyContent: "center",
+  },
+
+  picker: {
+    color: "black",
+    height: 50,
+  },
+
   input: {
     borderWidth: 1,
     borderColor: "#ddd",
