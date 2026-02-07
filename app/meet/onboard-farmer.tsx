@@ -40,6 +40,7 @@ export default function OnboardFarmer() {
   const [landSize, setLandSize] = useState("");
   const [cropCost, setCropCost] = useState("");
   const [inputSupplier, setInputSupplier] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const [paymentType, setPaymentType] = useState<"cash" | "credit">("cash");
   const [droneConsent, setDroneConsent] = useState(false);
   const [agronomistConsent, setAgronomistConsent] = useState(false);
@@ -271,6 +272,7 @@ export default function OnboardFarmer() {
         landSize: landSize ? Number(landSize) : undefined,
         cropCost: cropCost ? Number(cropCost) : undefined,
         inputSupplier: inputSupplier.trim() || undefined,
+        additionalInfo: additionalInfo.trim() || undefined,
         paymentType,
         droneSprayingConsent: droneConsent,
         agronomistCareConsent: agronomistConsent,
@@ -428,7 +430,7 @@ export default function OnboardFarmer() {
       </View> */}
 
       {/* Crop Type */}
-      <View style={styles.pickerBox}>
+      {/* <View style={styles.pickerBox}>
         <Picker
           selectedValue={cropType}
           onValueChange={setCropType}
@@ -444,6 +446,37 @@ export default function OnboardFarmer() {
             color="black"
           />
           <Picker.Item label="Turmeric" value="Turmeric" color="black" />
+        </Picker>
+      </View> */}
+      <View style={styles.pickerBox}>
+        <Picker
+          selectedValue={cropType}
+          onValueChange={setCropType}
+          style={{ color: "black" }}
+          dropdownIconColor="black"
+        >
+          <Picker.Item label="Select Crop *" value="" color="black" />
+
+          {/* Existing crops */}
+          <Picker.Item label="Banana" value="Banana" color="black" />
+          <Picker.Item label="Dry Coconut" value="Dry Coconut" color="black" />
+          <Picker.Item
+            label="Tender Coconut"
+            value="Tender Coconut"
+            color="black"
+          />
+          <Picker.Item label="Turmeric" value="Turmeric" color="black" />
+
+          <Picker.Item
+            label="Green Chilli"
+            value="Green Chilli"
+            color="black"
+          />
+          <Picker.Item label="Arecanut" value="Arecanut" color="black" />
+          <Picker.Item label="Tomato" value="Tomato" color="black" />
+          <Picker.Item label="Cabbage" value="Cabbage" color="black" />
+          <Picker.Item label="Cauliflower" value="Cauliflower" color="black" />
+          <Picker.Item label="Ginger" value="Ginger" color="black" />
         </Picker>
       </View>
 
@@ -541,6 +574,14 @@ export default function OnboardFarmer() {
         placeholderTextColor="#94a3b8"
         value={inputSupplier}
         onChangeText={setInputSupplier}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Additional Info"
+        placeholderTextColor="#94a3b8"
+        value={additionalInfo}
+        onChangeText={setAdditionalInfo}
       />
 
       {/* <View style={styles.row}>

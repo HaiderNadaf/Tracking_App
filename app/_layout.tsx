@@ -122,12 +122,79 @@
 //   );
 // }
 
+// import { Stack, router } from "expo-router";
+// import { useEffect } from "react";
+// import * as Notifications from "expo-notifications";
+
+// export default function RootLayout() {
+//   useEffect(() => {
+//     const handleResponse = (res: Notifications.NotificationResponse) => {
+//       const data = res.notification.request.content.data;
+
+//       if (!data?.type) return;
+
+//       console.log("🔔 Notification tapped:", data.type);
+
+//       switch (data.type) {
+//         case "AVAILABILITY":
+//           router.replace("/(tabs)");
+//           break;
+
+//         case "TASK_ASSIGNED":
+//           router.push(`/role/${data.role}`); // or `/tasks/${data.taskId}`
+//           break;
+
+//         default:
+//           break;
+//       }
+//     };
+
+//     // foreground / background
+//     const sub =
+//       Notifications.addNotificationResponseReceivedListener(handleResponse);
+
+//     // killed-state
+//     Notifications.getLastNotificationResponseAsync().then((res) => {
+//       if (res) handleResponse(res);
+//     });
+
+//     return () => sub.remove();
+//   }, []);
+
+//   return (
+//     <Stack screenOptions={{ headerShown: false }}>
+//       <Stack.Screen name="(tabs)" />
+//       <Stack.Screen name="tasks" />
+//       <Stack.Screen name="register" />
+//       <Stack.Screen name="login" />
+//       <Stack.Screen name="role/[type]" />
+//     </Stack>
+//   );
+// }
+
 import { Stack, router } from "expo-router";
 import { useEffect } from "react";
 import * as Notifications from "expo-notifications";
+import * as Updates from "expo-updates";
 
 export default function RootLayout() {
   useEffect(() => {
+    // 🔄 OTA UPDATE CHECK
+    const checkForOTAUpdate = async () => {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync(); // reload to apply update
+        }
+      } catch (err) {
+        console.log("OTA update check failed:", err);
+      }
+    };
+
+    checkForOTAUpdate();
+
+    // 🔔 NOTIFICATION HANDLER
     const handleResponse = (res: Notifications.NotificationResponse) => {
       const data = res.notification.request.content.data;
 
@@ -141,7 +208,7 @@ export default function RootLayout() {
           break;
 
         case "TASK_ASSIGNED":
-          router.push(`/role/${data.role}`); // or `/tasks/${data.taskId}`
+          router.push(`/role/${data.role}`);
           break;
 
         default:
@@ -149,16 +216,18 @@ export default function RootLayout() {
       }
     };
 
-    // foreground / background
+    // Foreground / background
     const sub =
       Notifications.addNotificationResponseReceivedListener(handleResponse);
 
-    // killed-state
+    // Killed-state
     Notifications.getLastNotificationResponseAsync().then((res) => {
       if (res) handleResponse(res);
     });
 
-    return () => sub.remove();
+    return () => {
+      sub.remove();
+    };
   }, []);
 
   return (
